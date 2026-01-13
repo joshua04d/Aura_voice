@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>AuraVoice Live Transcript</h2>
+<button onclick="start()">Start Listening</button>
+<p id="output"></p>
+
+<script>
+let ws;
+let mediaRecorder;
+
+function start() {
+    ws = new WebSocket("ws://localhost:8000/ws");
+
+    ws.onmessage = (event) => {
+        document.getElementById("output").innerText += event.data + " ";
+    };
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = async (e) => {
+            const arrayBuffer = await e.data.arrayBuffer();
+            ws.send(new Uint8Array(arrayBuffer));
+        };
+        mediaRecorder.start(250); // send chunks every 250ms
+    });
+}
+</script>
+</body>
+</html>
