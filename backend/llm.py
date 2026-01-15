@@ -1,6 +1,4 @@
-from openai import OpenAI
-
-client = OpenAI(api_key="YOUR_API_KEY")
+import requests
 
 def get_copilot_suggestion(user_text, intent, context):
     prompt = f"""
@@ -18,10 +16,13 @@ Suggest what the agent should say next.
 Keep it short, friendly, and professional.
 """
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role":"system","content":prompt}],
-        max_tokens=100
+    response = requests.post(
+        "http://localhost:11434/api/generate",
+        json={
+            "model": "phi3:mini",
+            "prompt": prompt,
+            "stream": False
+        }
     )
 
-    return response.choices[0].message.content
+    return response.json()["response"]
