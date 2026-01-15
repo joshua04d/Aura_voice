@@ -3,7 +3,7 @@
 <body>
 <h2>AuraVoice Live Transcript</h2>
 <button onclick="start()">Start Listening</button>
-<p id="output"></p>
+<div id="chat"></div>
 
 <script>
 let ws;
@@ -13,8 +13,12 @@ function start() {
     ws = new WebSocket("ws://localhost:8000/ws");
 
     ws.onmessage = (event) => {
-        document.getElementById("output").innerText += event.data + " ";
+        const chat = document.getElementById("chat");
+        const msg = document.createElement("p");
+        msg.innerText = event.data;
+        chat.appendChild(msg);
     };
+
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
         mediaRecorder = new MediaRecorder(stream);
